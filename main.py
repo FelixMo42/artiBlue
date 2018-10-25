@@ -1,7 +1,8 @@
-from models.LinearModel import LinearModel as Model
+from models.LinearModel import LinearModel
 
-model = Model()
+model = LinearModel()
 
-model.train()
+for i in range(2000):
+	model.train([i], [i * 2])
 
-print(model.test(4))
+print("4 * 2 =", model.test(4))
