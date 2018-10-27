@@ -1,10 +1,8 @@
 import tensorflow as tf
-import matplotlib.pyplot as plt
 
 class BasicModel():
 	name = "BasicModel_V1"
 	learning_rate = .001
-	losses = []
 
 	def __init__(self, shape):
 		with tf.variable_scope(self.name):
@@ -25,16 +23,10 @@ class BasicModel():
 			self.sess.run(tf.global_variables_initializer())
 
 	def train(self, data, expected):
-		self.losses.append(self.sess.run([self.loss, self.trainer], {
+		self.sess.run([self.loss, self.trainer], {
 			self.input: data,
 			self.expected: expected
-		})[0])
+		})[0]
 
 	def test(self, x):
 		return self.sess.run(self.output, {self.input: [x]})
-
-	def dump(self):
-		plt.plot(self.losses)
-		plt.ylabel('loss')
-		plt.xlabel('epoch')
-		plt.show()
