@@ -1,4 +1,10 @@
-import random
+from models.ReinforcementModel import ReinforcementModel
+
+model = ReinforcementModel([3,1])
+
+model.run("Pendulum-v0")
+
+'''import random
 
 from models.BasicModel import BasicModel
 
@@ -17,4 +23,4 @@ for i in range(iterations):
 	model.train(i, e)
 
 print(model.test([4, 3]))
-#model.dump()
+'''

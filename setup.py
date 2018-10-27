@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-REQUIRED_PACKAGES = ['tensorflow>=1.8']
+REQUIRED_PACKAGES = ['tensorflow>=1.8','gym>=0.10.8']
 
 setup(
 	name='artiBlue',
