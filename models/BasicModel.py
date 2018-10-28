@@ -16,7 +16,6 @@ class BasicModel():
 
 			self.loss = tf.losses.mean_squared_error(self.expected, self.output)
 			self.optimizer = tf.train.AdamOptimizer(self.learning_rate, epsilon=.001)
-			#self.optimizer = tf.train.AdagradOptimizer(self.learning_rate)
 			self.trainer = self.optimizer.minimize(self.loss)
 
 			self.sess = tf.Session()

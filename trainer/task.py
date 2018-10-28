@@ -1,10 +1,9 @@
 from models.ReinforcementModel import ReinforcementModel
 
-model = ReinforcementModel([3,1])
+#model = ReinforcementModel("Pendulum-v0", [3,4,1])
 
-model.run("Pendulum-v0")
-
-'''import random
+'''
+import random
 
 from models.BasicModel import BasicModel
 
