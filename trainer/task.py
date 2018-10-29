@@ -1,6 +1,6 @@
-from models.ReinforcementModel import ReinforcementModel
+from models.DDPG import DDPG
 
-#model = ReinforcementModel("Pendulum-v0", [3,4,1])
+model = DDPG("Pendulum-v0", [2,4,1])
 
 '''
 import random

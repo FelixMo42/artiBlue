@@ -6,7 +6,7 @@ import time
 np.random.seed(1)
 tf.set_random_seed(1)
 
-#####################  hyper parameters  ####################
+###############################  hyper parameters  #########################
 
 MAX_EPISODES = 200
 MAX_EP_STEPS = 200
@@ -91,7 +91,7 @@ class Actor(object):
             opt = tf.train.AdamOptimizer(-self.lr)  # (- learning rate) for ascent policy
             self.train_op = opt.apply_gradients(zip(self.policy_grads, self.e_params))
 
-###############################  Critic  ####################################
+###############################  Critic  ###################################
 
 class Critic(object):
     def __init__(self, sess, state_dim, action_dim, learning_rate, gamma, replacement, a, a_):
@@ -157,7 +157,7 @@ class Critic(object):
                 self.sess.run(self.hard_replacement)
             self.t_replace_counter += 1
 
-#####################  Memory  ####################
+###############################  Memory  ###################################
 
 class Memory(object):
     def __init__(self, capacity, dims):
@@ -175,6 +175,8 @@ class Memory(object):
         assert self.pointer >= self.capacity, 'Memory has not been fulfilled'
         indices = np.random.choice(self.capacity, size=n)
         return self.data[indices, :]
+
+###############################  Memory  ###################################
 
 env = gym.make(ENV_NAME)
 env = env.unwrapped
