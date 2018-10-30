@@ -10,7 +10,7 @@ MAX_EPISODES = 200
 MAX_EP_STEPS = 200
 LR_A = 0.001 # learning rate for actor
 LR_C = 0.001 # learning rate for critic
-GAMMA = 0.9	 # reward discount
+GAMMA = 0.90 # reward discount
 REPLACEMENT = [
 	dict(name='soft', tau=0.01),
 	dict(name='hard', rep_iter_a=600, rep_iter_c=500)
@@ -238,7 +238,7 @@ class DDPG(object):
 				s = s_
 				ep_reward += r
 
-				if j == MAX_EP_STEPS-1:
+				if j == MAX_EP_STEPS-1 or done:
 					print('Episode:', i, ' Reward: %i' % int(ep_reward), 'Explore: %.2f' % var, )
 					if ep_reward > -300:
 						RENDER = True
