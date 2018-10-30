@@ -192,8 +192,6 @@ class DDPG(object):
 
 		self.sess = tf.Session()
 
-		# Create actor and critic.
-		# They are actually connected to each other, details can be seen in tensorboard or in this picture:
 		self.actor = Actor(self.sess, self.action_dim, self.action_bound, LR_A, REPLACEMENT, self.S, self.R, self.S_)
 		self.critic = Critic(self.sess, self.state_dim, self.action_dim, LR_C, GAMMA, REPLACEMENT, self.actor.a, self.actor.a_, self.S, self.R, self.S_)
 		self.actor.add_grad_to_graph(self.critic.a_grads)
@@ -217,15 +215,14 @@ class DDPG(object):
 				if RENDER:
 					self.env.render()
 
-				# Add exploration noise
 				a = self.actor.choose_action(s)
-				a = np.clip(np.random.normal(a, var), -2, 2)	# add randomness to action selection for exploration
+				a = np.clip(np.random.normal(a, var), -2, 2)
 				s_, r, done, info = self.env.step(a)
 
 				M.store_transition(s, a, r / 10, s_)
 
 				if M.pointer > MEMORY_CAPACITY:
-					var *= .9995	# decay the action randomness
+					var *= .9995
 					b_M = M.sample(BATCH_SIZE)
 					b_s = b_M[:, :self.state_dim]
 					b_a = b_M[:, self.state_dim: self.state_dim + self.action_dim]
@@ -234,7 +231,6 @@ class DDPG(object):
 
 					self.critic.learn(b_s, b_a, b_r, b_s_)
 					self.actor.learn(b_s)
-
 				s = s_
 				ep_reward += r
 

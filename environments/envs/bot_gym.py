@@ -12,7 +12,7 @@ class BotGym(gym.Env):
 		self.max_torque = 1.
 
 		self.action_num = 1
-		self.observation_num = 4
+		self.observation_num = 2
 
 		self.action_space = spaces.Box(low=-self.max_torque, high=self.max_torque, shape=(self.action_num, ), dtype=np.float32)
 		self.observation_space = spaces.Box(low=-self.max_speed, high=self.max_speed, shape=(self.observation_num, ) , dtype=np.float32)
@@ -21,10 +21,13 @@ class BotGym(gym.Env):
 		self.x += action[0]
 
 		dist = abs(self.x - self.target_x)
-		reward = -dist
 		done = dist < 10
+		if done:
+			reward = 50
+		else:
+			reward = -(dist ** 2) / 500
 
-	 	return self.get_info(), reward, done, {}
+	 	return self.get_info(), reward, False, {}
 
 	def reset(self):
 		self.x = random.randint(10,490)
@@ -59,4 +62,4 @@ class BotGym(gym.Env):
 		return self.viewer.render(return_rgb_array = mode=='rgb_array')
 
 	def get_info(self):
-		return np.array([self.x, self.target_x])
+		return np.array([self.x / 255, self.target_x / 255])
