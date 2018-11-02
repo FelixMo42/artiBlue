@@ -8,33 +8,36 @@ class BotGym(gym.Env):
 	viewer = None
 
 	def __init__(self):
-		self.max_speed = 8
-		self.max_torque = 1.
+		self.max_observation = 2
+		self.max_action = 2.
 
-		self.action_num = 1
+		self.action_num = 2
 		self.observation_num = 2
 
-		self.action_space = spaces.Box(low=-self.max_torque, high=self.max_torque, shape=(self.action_num, ), dtype=np.float32)
-		self.observation_space = spaces.Box(low=-self.max_speed, high=self.max_speed, shape=(self.observation_num, ) , dtype=np.float32)
+		self.action_space = spaces.Box(low=-self.max_action, high=self.max_action, shape=(self.action_num, ), dtype=np.float32)
+		self.observation_space = spaces.Box(low=-self.max_observation, high=self.max_observation, shape=(self.observation_num, ) , dtype=np.float32)
 
 	def step(self, action):
 		self.x += action[0]
+		#self.y += action[1]
 
-		dist = abs(self.x - self.target_x)
-		done = dist < 10
+		distX = abs(self.x - self.target_x)
+		distY = abs(self.y - self.target_y)
+
+		done = distX < 10 and distY < 10
 		if done:
 			reward = 50
 		else:
-			reward = -(dist ** 2) / 500
+			reward = -(distX ** 2 + distY ** 2) / 10000
 
-	 	return self.get_info(), reward, False, {}
+		return self.get_info(), reward, done, {}
 
 	def reset(self):
-		self.x = random.randint(10,490)
-		self.y = 50
+		self.x = 10#random.randint(10,490)
+		self.y = 250#random.randint(10,490)
 
 		self.target_x = 250
-		self.target_y = 50
+		self.target_y = 250
 
 		return self.get_info()
 
@@ -62,4 +65,4 @@ class BotGym(gym.Env):
 		return self.viewer.render(return_rgb_array = mode=='rgb_array')
 
 	def get_info(self):
-		return np.array([self.x / 255, self.target_x / 255])
+		return np.array([(self.target_x - self.x) / (25 * 5), (self.target_y - self.y) / (25 * 5)])

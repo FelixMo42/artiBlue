@@ -3,18 +3,18 @@ import numpy as np
 import gym
 import time
 
-np.random.seed(1)
-tf.set_random_seed(1)
+np.random.seed(986)
+tf.set_random_seed(986)
 
 MAX_EPISODES = 200
 MAX_EP_STEPS = 200
 LR_A = 0.001 # learning rate for actor
-LR_C = 0.001 # learning rate for critic
-GAMMA = 0.90 # reward discount
+LR_C = 0.0001 # learning rate for critic
+GAMMA = 0.99 # reward discount
 REPLACEMENT = [
 	dict(name='soft', tau=0.01),
 	dict(name='hard', rep_iter_a=600, rep_iter_c=500)
-][0]			# you can try different target replacement strategies
+][0]
 MEMORY_CAPACITY = 10000
 BATCH_SIZE = 32
 
@@ -52,7 +52,7 @@ class Actor(object):
 
 	def _build_net(self, s, scope, trainable):
 		with tf.variable_scope(scope):
-			init_w = tf.random_normal_initializer(0., 0.3)
+			init_w = tf.random_normal_initializer(-0.3, 0.3)
 			init_b = tf.constant_initializer(0.1)
 			net = tf.layers.dense(s, 30, activation=tf.nn.relu,
 								  kernel_initializer=init_w, bias_initializer=init_b, name='l1',
@@ -133,7 +133,7 @@ class Critic(object):
 
 	def _build_net(self, s, a, scope, trainable):
 		with tf.variable_scope(scope):
-			init_w = tf.random_normal_initializer(0., 0.1)
+			init_w = tf.random_normal_initializer(-0.1, 0.1)
 			init_b = tf.constant_initializer(0.1)
 
 			with tf.variable_scope('l1'):
@@ -198,13 +198,13 @@ class DDPG(object):
 
 		self.sess.run(tf.global_variables_initializer())
 
-	def train(self, RENDER=False, OUTPUT_GRAPH=True, MAX_EPISODES=200, MAX_EP_STEPS=200, MEMORY_CAPACITY=10000, BATCH_SIZE=32):
+	def train(self, RENDER=False, OUTPUT_GRAPH=False, MAX_EPISODES=200, MAX_EP_STEPS=200, MEMORY_CAPACITY=10000, BATCH_SIZE=32):
 		M = Memory(MEMORY_CAPACITY, dims=2 * self.state_dim + self.action_dim + 1)
 
 		if OUTPUT_GRAPH:
 			tf.summary.FileWriter("logs/", self.sess.graph)
 
-		var = 3 # control exploration
+		var = 0 # control exploration
 
 		t1 = time.time()
 		for i in range(MAX_EPISODES):
@@ -235,7 +235,7 @@ class DDPG(object):
 				ep_reward += r
 
 				if j == MAX_EP_STEPS-1 or done:
-					print('Episode:', i, ' Reward: %i' % int(ep_reward), 'Explore: %.2f' % var, )
+					print('Episode:', i, ' Reward: %i' % (int(ep_reward) / j), 'Explore: %.2f' % var, )
 					if ep_reward > -300:
 						RENDER = True
 					break
