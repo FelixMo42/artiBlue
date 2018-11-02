@@ -204,7 +204,7 @@ class DDPG(object):
 		if OUTPUT_GRAPH:
 			tf.summary.FileWriter("logs/", self.sess.graph)
 
-		var = 0 # control exploration
+		var = 3 # control exploration
 
 		t1 = time.time()
 		for i in range(MAX_EPISODES):
@@ -235,7 +235,7 @@ class DDPG(object):
 				ep_reward += r
 
 				if j == MAX_EP_STEPS-1 or done:
-					print('Episode:', i, ' Reward: %i' % (int(ep_reward) / j), 'Explore: %.2f' % var, )
+					print('Episode:', i, ' Reward: %i' % (int(ep_reward) / (j + 1)), 'Explore: %.2f' % var, )
 					if ep_reward > -300:
 						RENDER = True
 					break

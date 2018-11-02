@@ -8,8 +8,8 @@ class BotGym(gym.Env):
 	viewer = None
 
 	def __init__(self):
-		self.max_observation = 2
-		self.max_action = 2.
+		self.max_observation = 1
+		self.max_action = 1
 
 		self.action_num = 2
 		self.observation_num = 2
@@ -26,14 +26,14 @@ class BotGym(gym.Env):
 
 		done = distX < 10 and distY < 10
 		if done:
-			reward = 50
+			reward = 10
 		else:
-			reward = -(distX ** 2 + distY ** 2) / 10000
+			reward = -(distX ** 2 + distY ** 2) / 5000
 
-		return self.get_info(), reward, done, {}
+		return self.get_info(), reward, False, {}
 
 	def reset(self):
-		self.x = 10#random.randint(10,490)
+		self.x = random.randint(10,490)
 		self.y = 250#random.randint(10,490)
 
 		self.target_x = 250
@@ -65,4 +65,8 @@ class BotGym(gym.Env):
 		return self.viewer.render(return_rgb_array = mode=='rgb_array')
 
 	def get_info(self):
-		return np.array([(self.target_x - self.x) / (25 * 5), (self.target_y - self.y) / (25 * 5)])
+		x = min((self.target_x - self.x) / 250, 1)
+		x = max((self.target_x - self.x) / 250, -1)
+		y = min((self.target_y - self.y) / 250, 1)
+		y = max((self.target_y - self.y) / 250, -1)
+		return np.array([x, y])
