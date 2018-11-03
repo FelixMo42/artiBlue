@@ -31,17 +31,18 @@ class BotGym(gym.Env):
 	viewer = None
 
 	def __init__(self):
-		self.max = 1
+		self.max = 300
+		self.speed = 3.0
 
 		self.action_num = 2
 		self.observation_num = 2
 
-		self.action_space = spaces.Box(low=-self.max, high=self.max, shape=(self.action_num, ), dtype=np.float32)
+		self.action_space = spaces.Box(low=-2, high=2, shape=(self.action_num, ), dtype=np.float32)
 		self.observation_space = spaces.Box(low=-self.max, high=self.max, shape=(self.observation_num, ) , dtype=np.float32)
 
 	def step(self, action):
-		self.x += action[0] / self.max
-		self.y += action[1] / self.max
+		self.x += action[0]# * self.speed / self.max
+		self.y += action[1]# * self.speed / self.max
 
 		distX = abs(self.x - self.target_x)
 		distY = abs(self.y - self.target_y)
@@ -51,7 +52,7 @@ class BotGym(gym.Env):
 			self.win = 1
 			reward = 10
 		else:
-			reward = -(distX ** 2 + distY ** 2) / 5000
+			reward = -(distX ** 2 + distY ** 2) / 2500
 
 		return self.get_info(), reward, False, {}
 

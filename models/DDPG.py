@@ -216,7 +216,7 @@ class DDPG(object):
 					self.env.render()
 
 				a = self.actor.choose_action(s)
-				a = np.clip(np.random.normal(a, var), -2, 2)
+				a = np.clip(np.random.normal(a, var), -self.action_bound, self.action_bound)
 				s_, r, done, info = self.env.step(a)
 
 				M.store_transition(s, a, r / 10, s_)
