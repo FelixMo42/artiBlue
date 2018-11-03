@@ -4,6 +4,7 @@ from gym import spaces
 import random
 import matplotlib.pyplot as plt
 import numpy as np
+import math
 
 GRAPHING = True
 
@@ -32,33 +33,40 @@ class BotGym(gym.Env):
 
 	def __init__(self):
 		self.max = 300
-		self.speed = 3.0
+		self.speed = 2.0
 
 		self.action_num = 2
-		self.observation_num = 2
+		self.observation_num = 5
 
-		self.action_space = spaces.Box(low=-2, high=2, shape=(self.action_num, ), dtype=np.float32)
+		self.action_space = spaces.Box(low=-self.speed, high=self.speed, shape=(self.action_num, ), dtype=np.float32)
 		self.observation_space = spaces.Box(low=-self.max, high=self.max, shape=(self.observation_num, ) , dtype=np.float32)
 
 	def step(self, action):
-		self.x += action[0]# * self.speed / self.max
-		self.y += action[1]# * self.speed / self.max
+		self.x += action[0] * math.sin(math.radians(self.angle))
+		self.y += action[0] * math.cos(math.radians(self.angle))
+		
+		self.angle += action[1]
+		while self.angle > 180 or self.angle < -180:
+			if self.angle > 180:
+				self.angle = self.angle - 360
+			elif self.angle < -180:
+				self.angle = 360 - self.angle
 
 		distX = abs(self.x - self.target_x)
 		distY = abs(self.y - self.target_y)
 
+		reward = -(distX ** 2 + distY ** 2) / 2500
+
 		done = distX < 10 and distY < 10
 		if done:
 			self.win = 1
-			reward = 10
-		else:
-			reward = -(distX ** 2 + distY ** 2) / 2500
 
 		return self.get_info(), reward, False, {}
 
 	def reset(self):
-		self.x = random.randint(10,490)
-		self.y = random.randint(10,490)
+		self.x = 50#random.randint(10,490)
+		self.y = 50#random.randint(10,490)
+		self.angle = 0
 
 		self.target_x = 250
 		self.target_y = 250
@@ -82,20 +90,25 @@ class BotGym(gym.Env):
 			target.set_color(0,255,0)
 			self.viewer.add_geom(target)
 
-			bot = rendering.make_circle(10)
+			bot = rendering.make_capsule(10,20)
 			self.bot_transform = rendering.Transform()
 			bot.add_attr(self.bot_transform)
 			bot.set_color(0,0,255)
 			self.viewer.add_geom(bot)
 
 		self.target_transform.set_translation(self.target_x, self.target_y)
+		self.bot_transform.set_rotation(math.radians(90 - self.angle))
 		self.bot_transform.set_translation(self.x, self.y)
 
 		return self.viewer.render(return_rgb_array = mode=='rgb_array')
 
 	def get_info(self):
-		x = min((self.target_x - self.x), self.max)
-		x = max((self.target_x - self.x), -self.max)
-		y = min((self.target_y - self.y), self.max)
-		y = max((self.target_y - self.y), -self.max)
-		return np.array([x, y])
+		x = max(min(self.target_x - self.x, self.max), -self.max)
+		y = max(min(self.target_y - self.y, self.max), -self.max)
+
+		angle_sin = math.sin( math.radians(self.angle) ) * self.max
+		angle_cos = math.cos( math.radians(self.angle) ) * self.max
+
+		angle_offset = math.radians(self.angle) - math.atan2(self.target_y - self.y, self.target_x - self.x)
+
+		return np.array([x, y, angle_offset, angle_sin, angle_cos])
