@@ -36,26 +36,25 @@ class BotGym(gym.Env):
 		self.speed = 2.0
 
 		self.action_num = 2
-		self.observation_num = 5
+		self.observation_num = 3
 
 		self.action_space = spaces.Box(low=-self.speed, high=self.speed, shape=(self.action_num, ), dtype=np.float32)
 		self.observation_space = spaces.Box(low=-self.max, high=self.max, shape=(self.observation_num, ) , dtype=np.float32)
 
 	def step(self, action):
-		self.x += action[0] * math.sin(math.radians(self.angle))
-		self.y += action[0] * math.cos(math.radians(self.angle))
+		#self.x += action[0] * math.sin(math.radians(self.angle))
+		#self.y += action[0] * math.cos(math.radians(self.angle))
 		
 		self.angle += action[1]
-		while self.angle > 180 or self.angle < -180:
-			if self.angle > 180:
-				self.angle = self.angle - 360
-			elif self.angle < -180:
-				self.angle = 360 - self.angle
 
 		distX = abs(self.x - self.target_x)
 		distY = abs(self.y - self.target_y)
 
-		reward = -(distX ** 2 + distY ** 2) / 2500
+		a1 = math.radians(90 - self.angle)
+		a2 = math.atan2(self.target_y - self.y, self.target_x - self.x)
+
+		a = math.atan2(math.sin(a1-a2), math.cos(a1-a2))
+		reward = -(a ** 2) * 10#-(distX ** 2 + distY ** 2) / 2500
 
 		done = distX < 10 and distY < 10
 		if done:
@@ -66,7 +65,7 @@ class BotGym(gym.Env):
 	def reset(self):
 		self.x = 50#random.randint(10,490)
 		self.y = 50#random.randint(10,490)
-		self.angle = 0
+		self.angle = 45
 
 		self.target_x = 250
 		self.target_y = 250
@@ -109,6 +108,6 @@ class BotGym(gym.Env):
 		angle_sin = math.sin( math.radians(self.angle) ) * self.max
 		angle_cos = math.cos( math.radians(self.angle) ) * self.max
 
-		angle_offset = math.radians(self.angle) - math.atan2(self.target_y - self.y, self.target_x - self.x)
+		angle_offset = math.radians(90 - self.angle) - math.atan2(self.target_y - self.y, self.target_x - self.x)
 
-		return np.array([x, y, angle_offset, angle_sin, angle_cos])
+		return np.array([x, y, angle_offset])
