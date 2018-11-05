@@ -18,7 +18,7 @@ if GRAPHING:
 		global data10
 
 		data.append(d)
-	
+
 		if len(data) % 10 == 0:
 			data10.append(sum(data[-10:]) / 10.0)
 
@@ -44,7 +44,7 @@ class BotGym(gym.Env):
 	def step(self, action):
 		#self.x += action[0] * math.sin(math.radians(self.angle))
 		#self.y += action[0] * math.cos(math.radians(self.angle))
-		
+
 		self.angle += action[1]
 
 		distX = abs(self.x - self.target_x)
@@ -60,7 +60,7 @@ class BotGym(gym.Env):
 		if done:
 			self.win = 1
 
-		return self.get_info(), reward, False, {}
+		return self.get_info(), -(action[1] ** 2), False, {}
 
 	def reset(self):
 		self.x = 50#random.randint(10,490)
@@ -80,9 +80,9 @@ class BotGym(gym.Env):
 	def render(self, mode='human', close=False):
 		if self.viewer is None:
 			from gym.envs.classic_control import rendering
-			
+
 			self.viewer = rendering.Viewer(500,500)
-			
+
 			target = rendering.make_circle(10)
 			self.target_transform = rendering.Transform()
 			target.add_attr(self.target_transform)
