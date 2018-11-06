@@ -32,10 +32,10 @@ class BotGym(gym.Env):
 	viewer = None
 
 	def __init__(self):
-		self.max = 300
+		self.max = 10
 		self.speed = 2.0
 
-		self.action_num = 2
+		self.action_num = 1
 		self.observation_num = 3
 
 		self.action_space = spaces.Box(low=-self.speed, high=self.speed, shape=(self.action_num, ), dtype=np.float32)
@@ -45,7 +45,7 @@ class BotGym(gym.Env):
 		#self.x += action[0] * math.sin(math.radians(self.angle))
 		#self.y += action[0] * math.cos(math.radians(self.angle))
 
-		self.angle += action[1]
+		self.angle += action[0]
 
 		distX = abs(self.x - self.target_x)
 		distY = abs(self.y - self.target_y)
@@ -60,7 +60,7 @@ class BotGym(gym.Env):
 		if done:
 			self.win = 1
 
-		return self.get_info(), -(action[1] ** 2), False, {}
+		return self.get_info(), -(action[0] ** 2) * 50, False, {}
 
 	def reset(self):
 		self.x = 50#random.randint(10,490)
@@ -110,4 +110,4 @@ class BotGym(gym.Env):
 
 		angle_offset = math.radians(90 - self.angle) - math.atan2(self.target_y - self.y, self.target_x - self.x)
 
-		return np.array([x, y, angle_offset])
+		return np.array([x,y,angle_offset])
