@@ -12,18 +12,20 @@ if GRAPHING:
 	plt.ion()
 	fig = plt.figure()
 	data = []
-	data10 = []
+	data10 = [0]
+
+	avgPer = 5
 
 	def update(d):
 		global data10
 
 		data.append(d)
 
-		if len(data) % 10 == 0:
-			data10.append(sum(data[-10:]) / 10.0)
+		if len(data) % avgPer == 0:
+			data10.append(sum(data[-avgPer:]) / avgPer)
 
 		fig.clf()
-		plt.plot(np.arange(len(data10)) * 10, data10)
+		plt.plot(np.arange(len(data10)) * 1.0 * avgPer, data10)
 
 		data10 = data10[-100:]
 
@@ -31,47 +33,59 @@ class BotGym(gym.Env):
 	_seed =  42
 	viewer = None
 
+	avgReward = 0
+
 	def __init__(self):
-		self.max = 10
+		self.max = 300
 		self.speed = 2.0
 
-		self.action_num = 1
+		self.action_num = 2
 		self.observation_num = 3
 
-		self.action_space = spaces.Box(low=-self.speed, high=self.speed, shape=(self.action_num, ), dtype=np.float32)
+		self.avgReward = 0
+
+		self.action_space = spaces.Box(low=-self.max, high=self.max, shape=(self.action_num, ), dtype=np.float32)
 		self.observation_space = spaces.Box(low=-self.max, high=self.max, shape=(self.observation_num, ) , dtype=np.float32)
 
 	def step(self, action):
-		#self.x += action[0] * math.sin(math.radians(self.angle))
-		#self.y += action[0] * math.cos(math.radians(self.angle))
+		a0 = action[0] * self.speed / self.max
+		a1 = action[1] * self.speed / self.max
 
-		self.angle += action[0]
+		self.x += a0 * math.sin(math.radians(self.angle))
+		self.y += a0 * math.cos(math.radians(self.angle))
+
+		self.angle += a1
 
 		distX = abs(self.x - self.target_x)
 		distY = abs(self.y - self.target_y)
 
-		a1 = math.radians(90 - self.angle)
-		a2 = math.atan2(self.target_y - self.y, self.target_x - self.x)
+		#a1 = math.radians(90 - self.angle)
+		#a2 = math.atan2(self.target_y - self.y, self.target_x - self.x)
+		#a = math.atan2(math.sin(a1-a2), math.cos(a1-a2))
+		#reward = -(a ** 2) * 10#-(distX ** 2 + distY ** 2) / 2500
 
-		a = math.atan2(math.sin(a1-a2), math.cos(a1-a2))
-		reward = -(a ** 2) * 10#-(distX ** 2 + distY ** 2) / 2500
+		reward = -(distX ** 2 + distY ** 2) / 5000
 
 		done = distX < 10 and distY < 10
 		if done:
 			self.win = 1
 
-		return self.get_info(), -(action[0] ** 2) * 50, False, {}
+		self.avgReward += reward
+		return self.get_info(), reward, False, {}
 
 	def reset(self):
 		self.x = 50#random.randint(10,490)
 		self.y = 50#random.randint(10,490)
-		self.angle = 45
+		self.angle = 0#45
 
 		self.target_x = 250
 		self.target_y = 250
 
-		if GRAPHING and self.viewer:
-			update(self.win)
+		#if GRAPHING and self.viewer:
+		#	update(self.win)
+
+		update(self.avgReward / 200.0)
+		self.avgReward = 0
 
 		self.win = 0
 
@@ -108,6 +122,9 @@ class BotGym(gym.Env):
 		angle_sin = math.sin( math.radians(self.angle) ) * self.max
 		angle_cos = math.cos( math.radians(self.angle) ) * self.max
 
-		angle_offset = math.radians(90 - self.angle) - math.atan2(self.target_y - self.y, self.target_x - self.x)
+		a1 = math.radians(90 - self.angle)
+		a2 = math.atan2(self.target_y - self.y, self.target_x - self.x)
 
-		return np.array([x,y,angle_offset])
+		angle_offset = math.atan2(math.sin(a1-a2), math.cos(a1-a2)) / math.pi * self.max
+
+		return np.array([x, y, angle_offset])
