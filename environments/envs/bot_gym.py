@@ -11,23 +11,25 @@ GRAPHING = True
 if GRAPHING:
 	plt.ion()
 	fig = plt.figure()
-	data = []
-	data10 = [0]
+
+	dataWin = []
+	data10Win = []
+	dataRew = []
+	data10Rew = []
 
 	avgPer = 5
 
-	def update(d):
-		global data10
+	def update(w, r):
+		dataWin.append(w)
+		dataRew.append(r)
 
-		data.append(d)
-
-		if len(data) % avgPer == 0:
-			data10.append(sum(data[-avgPer:]) / avgPer)
+		if len(dataWin) % avgPer == 0:
+			data10Win.append(sum(dataWin[-avgPer:]) / avgPer)
+			data10Rew.append(sum(dataRew[-avgPer:]) / avgPer)
 
 		fig.clf()
-		plt.plot(np.arange(len(data10)) * 1.0 * avgPer, data10)
-
-		data10 = data10[-100:]
+		plt.plot(np.arange(len(data10Win)) * 1.0 * avgPer, data10Win)
+		plt.plot(np.arange(len(data10Rew)) * 1.0 * avgPer, data10Rew)
 
 class BotGym(gym.Env):
 	_seed =  42
@@ -64,11 +66,11 @@ class BotGym(gym.Env):
 		#a = math.atan2(math.sin(a1-a2), math.cos(a1-a2))
 		#reward = -(a ** 2) * 10#-(distX ** 2 + distY ** 2) / 2500
 
-		reward = -(distX ** 2 + distY ** 2) / 5000
+		reward = -(distX ** 2 + distY ** 2) / 10000
 
 		done = distX < 10 and distY < 10
 		if done:
-			self.win = 1
+			self.win = 10
 
 		self.avgReward += reward
 		return self.get_info(), reward, False, {}
@@ -81,12 +83,10 @@ class BotGym(gym.Env):
 		self.target_x = 250
 		self.target_y = 250
 
-		#if GRAPHING and self.viewer:
-		#	update(self.win)
+		if GRAPHING and self.viewer:
+			update(self.win, self.avgReward / 200.0)
 
-		update(self.avgReward / 200.0)
 		self.avgReward = 0
-
 		self.win = 0
 
 		return self.get_info()
