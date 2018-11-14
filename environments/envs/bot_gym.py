@@ -17,7 +17,7 @@ if GRAPHING:
 	dataRew = []
 	data10Rew = []
 
-	avgPer = 5
+	avgPer = 10
 
 	def update(w, r):
 		dataWin.append(w)
@@ -28,8 +28,13 @@ if GRAPHING:
 			data10Rew.append(sum(dataRew[-avgPer:]) / avgPer)
 
 		fig.clf()
-		plt.plot(np.arange(len(data10Win)) * 1.0 * avgPer, data10Win)
-		plt.plot(np.arange(len(data10Rew)) * 1.0 * avgPer, data10Rew)
+		plt.subplot(2, 1, 1)
+		plt.plot(np.arange(len(data10Win)) * avgPer * 10, data10Win)
+		plt.ylabel("win percent")
+
+		plt.subplot(2, 1, 2)
+		plt.plot(np.arange(len(data10Rew)) * avgPer, data10Rew)
+		plt.ylabel("avg reward")
 
 class BotGym(gym.Env):
 	_seed =  42
@@ -66,7 +71,7 @@ class BotGym(gym.Env):
 		#a = math.atan2(math.sin(a1-a2), math.cos(a1-a2))
 		#reward = -(a ** 2) * 10#-(distX ** 2 + distY ** 2) / 2500
 
-		reward = -(distX ** 2 + distY ** 2) / 10000
+		reward = -(distX ** 2 + distY ** 2) / 5000
 
 		done = distX < 10 and distY < 10
 		if done:
@@ -76,8 +81,8 @@ class BotGym(gym.Env):
 		return self.get_info(), reward, False, {}
 
 	def reset(self):
-		self.x = 50#random.randint(10,490)
-		self.y = 50#random.randint(10,490)
+		self.x = random.randint(10,490)
+		self.y = random.randint(10,490)
 		self.angle = 0#45
 
 		self.target_x = 250
