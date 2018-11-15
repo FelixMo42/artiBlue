@@ -29,7 +29,7 @@ if GRAPHING:
 
 		fig.clf()
 		plt.subplot(2, 1, 1)
-		plt.plot(np.arange(len(data10Win)) * avgPer * 10, data10Win)
+		plt.plot(np.arange(len(data10Win)) * avgPer, data10Win)
 		plt.ylabel("win percent")
 
 		plt.subplot(2, 1, 2)
@@ -75,10 +75,11 @@ class BotGym(gym.Env):
 
 		done = distX < 10 and distY < 10
 		if done:
-			self.win = 10
+			reward = 10
+			self.win = 1.0
 
 		self.avgReward += reward
-		return self.get_info(), reward, False, {}
+		return self.get_info(), reward, done, {}
 
 	def reset(self):
 		self.x = random.randint(10,490)
