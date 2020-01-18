@@ -1,4 +1,4 @@
-from models.DDPG import DDPG
+from models import DDPG
 
 model = DDPG("BotGym-v0")
 #model = DDPG("Pendulum-v0")
